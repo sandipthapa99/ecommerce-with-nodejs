@@ -7,6 +7,7 @@ import { BadRequestException } from '../exceptions/bad-request';
 import { ErrorCode } from '../exceptions/root';
 import { UnprocessableEntityException } from '../exceptions/validation';
 import { SignUpSchema } from '../schema/users';
+import { NotFoundException } from '../exceptions/not-found';
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -16,12 +17,17 @@ export const login = async (req: Request, res: Response) => {
   });
 
   if (!user) {
-    throw Error('User does not exists');
-    // return res.status(400).json({ message: 'User already exists' });
+    throw new NotFoundException(
+      'User does not exists',
+      ErrorCode.USER_NOT_FOUND
+    );
   }
 
   if (!compareSync(password, user.password)) {
-    throw Error('Password is incorrect');
+    throw new BadRequestException(
+      'Password is incorrect',
+      ErrorCode.INCORRECT_PASSWORD
+    );
   }
 
   const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
@@ -42,11 +48,9 @@ export const signup = async (
   });
 
   if (user) {
-    next(
-      new BadRequestException(
-        'User already exists',
-        ErrorCode.USER_ALREADY_EXISTS
-      )
+    throw new BadRequestException(
+      'User already exists',
+      ErrorCode.USER_ALREADY_EXISTS
     );
   }
 
