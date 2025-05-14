@@ -5,7 +5,6 @@ import * as jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../secrets';
 import { BadRequestException } from '../exceptions/bad-request';
 import { ErrorCode } from '../exceptions/root';
-import { UnprocessableEntityException } from '../exceptions/validation';
 import { SignUpSchema } from '../schema/users';
 import { NotFoundException } from '../exceptions/not-found';
 
@@ -59,4 +58,9 @@ export const signup = async (
   });
 
   res.json(user);
+};
+
+// me -> return logged in user
+export const me = async (req: any, res: Response) => {
+  res.json(req.user);
 };
